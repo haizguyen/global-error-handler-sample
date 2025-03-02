@@ -1,40 +1,79 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { ErrorHandlerService } from '../../global-error-handler/services/error-handler.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable, timer } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
+import { BaseApiService } from '../../global-error-handler/services/base-api.service';
+import { LogService } from '../../global-error-handler/services/log.service';
 import { SimulatedHttpError } from '../../global-error-handler/models/http-error.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ErrorDemoService {
+export class ErrorDemoService extends BaseApiService {
   constructor(
-    private http: HttpClient,
-    private errorHandler: ErrorHandlerService
-  ) {}
-
-  simulateHttpError(): Observable<any> {
-    const headers = new HttpHeaders().set('X-Error-Handled', 'true');
-    return this.http.get('https://api.example.com/non-existent-endpoint', { headers });
+    http: HttpClient,
+    logService: LogService
+  ) {
+    super(http, logService);
   }
 
-  simulateDirectError(): Observable<any> {
-    const headers = new HttpHeaders().set('X-Error-Handled', 'true');
-    return new Observable(subscriber => {
-      setTimeout(() => {
-        const error = new SimulatedHttpError(
-          'Internal Server Error',
-          500,
-          'Internal Server Error',
-          'https://api.example.com/simulated-error',
-          { message: 'Simulated server error occurred' }
-        );
-        subscriber.error(error);
-      }, 100);
+  // Test various error scenarios
+  simulateHttpError(): Observable<any> {
+    // Test connection timeout
+    return this.get('https://api.example.com/timeout', {
+      timeoutMs: 2000, // Short timeout
+      retries: 1
     });
   }
 
-  private handleApiError(error: HttpErrorResponse | SimulatedHttpError, operation: string) {
-    return this.errorHandler.handleError(operation, error as HttpErrorResponse);
+  simulateNetworkError(): Observable<any> {
+    // Invalid domain to trigger network error
+    return this.get('https://invalid-domain-xyz.com/api', {
+      retries: 0 // No retries for quick failure
+    });
+  }
+
+  simulateAuthError(): Observable<any> {
+    // Test 401 unauthorized
+    return this.get('https://api.example.com/unauthorized', {
+      suppressError: false,
+      retries: 0
+    });
+  }
+
+  simulateServerError(): Observable<any> {
+    // Test 500 server error with retries
+    return this.get('https://api.example.com/server-error', {
+      retries: 2,
+      timeoutMs: 5000
+    });
+  }
+
+  simulateValidationError(): Observable<any> {
+    // Test 400 bad request with validation errors
+    return this.post('https://api.example.com/validate', {
+      invalidField: 'test'
+    });
+  }
+
+  // Simulate rate limiting with multiple rapid requests
+  simulateRateLimit(): Observable<any> {
+    return timer(0, 100).pipe(
+      mergeMap(() => 
+        this.get('https://api.example.com/rate-limited', {
+          suppressError: true,
+          retries: 0
+        })
+      )
+    );
+  }
+
+  // Test error recovery
+  simulateRecovery(): Observable<any> {
+    // This will fail twice but succeed on third try
+    return this.get('https://api.example.com/intermittent', {
+      retries: 3,
+      timeoutMs: 1000
+    });
   }
 }
