@@ -2,6 +2,25 @@
 
 A comprehensive error handling solution for Angular applications, demonstrating best practices and modern architectural patterns.
 
+## Prerequisites
+
+This project uses [Volta](https://volta.sh/) to ensure consistent Node.js and npm versions across development environments.
+
+```json
+"volta": {
+  "node": "20.11.1",
+  "npm": "10.2.4"
+}
+```
+
+To get started:
+1. Install Volta if you haven't already:
+   ```bash
+   curl https://get.volta.sh | bash
+   ```
+   
+2. The required Node.js and npm versions will be automatically installed when you navigate to the project directory.
+
 ## Features
 
 - Global error handling with custom error types
@@ -198,6 +217,15 @@ The demo includes various error scenarios that can be tested:
 4. Click "Server Error" to test retry mechanisms
 5. Click "Rate Limit" to see rate limiting protection in action
 6. Click "Error Recovery" to test automatic recovery
+
+## Development
+
+### Version Requirements
+- Node.js: 20.11.1 (LTS)
+- npm: 10.2.4
+- Angular: 17.3.8
+
+This project uses Volta to manage Node.js and npm versions. The required versions are automatically enforced when you're in the project directory.
 
 ## Contributing
 
