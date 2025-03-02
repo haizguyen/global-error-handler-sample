@@ -1,40 +1,50 @@
 
 # Global Error Handler Sample Project
 
-## Giới thiệu
-Project mẫu tích hợp:
-- Global Error Handler sử dụng NgZone.
-- Bắt lỗi runtime và HTTP.
-- Ghi log qua LogService sử dụng NgRx Store.
-- Hiển thị thông báo bằng SweetAlert2 và MatSnackBar.
-- DemoComponent để test log và lỗi.
+## Introduction
+This sample project demonstrates the integration of:
 
-## Cài đặt
+- A Global Error Handler leveraging **NgZone**.
+- Comprehensive error handling for both runtime and HTTP errors.
+- Centralized logging through **LogService** using **NgRx Store**.
+- User notifications via **SweetAlert2** (popup) and **MatSnackBar** (toast).
+- A **DemoComponent** for testing logging and error capturing mechanisms.
+
+## Installation
+To install the project dependencies, run:
+
 ```bash
 npm install
 ```
 
-## Chạy project
+## Running the Project
+To start the development server, execute:
+
 ```bash
 ng serve
 ```
 
-## Các chức năng chính
-| Button | Chức năng |
-|--------|-----------|
-| Log Success (Toast) | Ghi log success và hiển thị Toast |
-| Log Error (Popup) | Ghi log error và hiển thị Popup |
-| Throw Error | Tạo lỗi để test Global Error Handler |
+Then navigate to `http://localhost:4200/` in your browser.
 
-## Thư mục chính
+## Features
+| Button | Description |
+|--------|-------------|
+| **Log Success (Toast)** | Records a success log and displays a toast notification. |
+| **Log Error (Popup)**  | Records an error log and displays a popup notification. |
+| **Throw Error**        | Simulates an error to test the Global Error Handler. |
+
+## Project Structure
 ```
 src/app/
-  ├── global-error-handler/
-  ├── demo/
-  ├── app.module.ts
-  ├── app.component.ts
+  ├── global-error-handler/  // Global error handling logic
+  ├── demo/                  // Demo component for testing
+  ├── app.module.ts          // Application module
+  ├── app.component.ts       // Root component
 ```
 
-## Lưu ý
-- Có thể thay thế SweetAlert2 và MatSnackBar dễ dàng bằng cách sửa trong `NotificationService`.
-- Toàn bộ log API được ghi lại tự động qua `ApiLoggingInterceptor`.
+## Notes
+- **SweetAlert2** and **MatSnackBar** can be easily replaced or customized via the `NotificationService`.
+- All API interactions are automatically logged using the `ApiLoggingInterceptor`.
+
+## License
+This project is provided as a sample and is open for modification and use within your own applications.
