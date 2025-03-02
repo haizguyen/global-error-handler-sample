@@ -2,7 +2,9 @@ import { Component } from '@angular/core';
 import { LogService } from '../global-error-handler/services/log.service';
 import { ErrorDemoService } from './services/error-demo.service';
 import { ErrorMessageService } from '../global-error-handler/services/error-message.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { ErrorHandlerService } from '../global-error-handler/services/error-handler.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-demo',
@@ -13,7 +15,7 @@ export class DemoComponent {
   constructor(
     private logService: LogService,
     private errorDemoService: ErrorDemoService,
-    private errorMessageService: ErrorMessageService
+    private errorHandler: ErrorHandlerService
   ) {}
 
   logSuccess() {
@@ -29,31 +31,22 @@ export class DemoComponent {
   }
 
   triggerHttpError() {
-    this.errorDemoService.simulateHttpError().subscribe({
-      next: () => {},
-      error: (error: HttpErrorResponse) => {
-        const friendlyMessage = this.errorMessageService.getFriendlyMessage(error);
-        this.logService.log(
-          friendlyMessage,
-          'error',
-          this.errorMessageService.getDetailedErrorMessage('GET /non-existent-endpoint', error),
-          { toast: true }
-        );
-      }
-    });
+    this.errorDemoService.simulateHttpError()
+      .pipe(
+        catchError(error => {
+          return of(null); // Prevent the error from propagating after handling
+        })
+      )
+      .subscribe();
   }
 
   triggerDirectError() {
-    this.errorDemoService.simulateDirectError().subscribe({
-      next: () => {},
-      error: (error: Error) => {
-        this.logService.log(
-          error.message,
-          'error',
-          error.stack,
-          { toast: true }
-        );
-      }
-    });
+    this.errorDemoService.simulateDirectError()
+      .pipe(
+        catchError(error => {
+          return of(null); // Prevent the error from propagating after handling
+        })
+      )
+      .subscribe();
   }
 }
