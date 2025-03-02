@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { LogService } from '../global-error-handler/services/log.service';
 import { ErrorDemoService } from './services/error-demo.service';
+import { ErrorMessageService } from '../global-error-handler/services/error-message.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-demo',
@@ -10,7 +12,8 @@ import { ErrorDemoService } from './services/error-demo.service';
 export class DemoComponent {
   constructor(
     private logService: LogService,
-    private errorDemoService: ErrorDemoService
+    private errorDemoService: ErrorDemoService,
+    private errorMessageService: ErrorMessageService
   ) {}
 
   logSuccess() {
@@ -28,15 +31,14 @@ export class DemoComponent {
   triggerHttpError() {
     this.errorDemoService.simulateHttpError().subscribe({
       next: () => {},
-      error: (error) => {
-        debugger
+      error: (error: HttpErrorResponse) => {
+        const friendlyMessage = this.errorMessageService.getFriendlyMessage(error);
         this.logService.log(
-          'HTTP request failed!', 
-          'error', 
-          error, 
+          friendlyMessage,
+          'error',
+          this.errorMessageService.getDetailedErrorMessage('GET /non-existent-endpoint', error),
           { toast: true }
         );
-        console.log('HTTP error caught in component:', error);
       }
     });
   }
@@ -44,14 +46,13 @@ export class DemoComponent {
   triggerDirectError() {
     this.errorDemoService.simulateDirectError().subscribe({
       next: () => {},
-      error: (error) => {
+      error: (error: Error) => {
         this.logService.log(
-          'Direct API error occurred!', 
-          'error', 
-          error, 
-          { toast: false }
+          error.message,
+          'error',
+          error.stack,
+          { toast: true }
         );
-        console.log('Direct error caught in component:', error);
       }
     });
   }

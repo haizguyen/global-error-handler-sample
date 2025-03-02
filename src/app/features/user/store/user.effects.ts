@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { map, mergeMap, catchError } from 'rxjs/operators';
 import { UserService } from '../services/user.service';
 import { LogService } from '../../../global-error-handler/services/log.service';
+import { ErrorMessageService } from '../../../global-error-handler/services/error-message.service';
 import * as UserActions from './user.actions';
 
 @Injectable()
@@ -15,10 +16,10 @@ export class UserEffects {
         map(users => UserActions.loadUsersSuccess({ users })),
         catchError(error => {
           this.logService.log(
-            'Failed to load users', 
-            'error', 
-            error, 
-            { toast: true }
+            this.errorMessageService.getDetailedErrorMessage('GET /users', error),
+            'error',
+            error,
+            { popup: true }
           );
           return of(UserActions.loadUsersFailure({ error }));
         })
@@ -31,18 +32,18 @@ export class UserEffects {
       .pipe(
         map(() => {
           this.logService.log(
-            'User added successfully', 
-            'success', 
-            undefined, 
+            'User added successfully',
+            'success',
+            undefined,
             { toast: true }
           );
           return UserActions.loadUsers();
         }),
         catchError(error => {
           this.logService.log(
-            'Failed to add user', 
-            'error', 
-            error, 
+            this.errorMessageService.getDetailedErrorMessage('POST /users', error, { user }),
+            'error',
+            error,
             { toast: true }
           );
           return of(UserActions.loadUsersFailure({ error }));
@@ -56,18 +57,18 @@ export class UserEffects {
       .pipe(
         map(() => {
           this.logService.log(
-            'User updated successfully', 
-            'success', 
-            undefined, 
+            'User updated successfully',
+            'success',
+            undefined,
             { toast: true }
           );
           return UserActions.loadUsers();
         }),
         catchError(error => {
           this.logService.log(
-            'Failed to update user', 
-            'error', 
-            error, 
+            this.errorMessageService.getDetailedErrorMessage(`PUT /users/${user.id}`, error, { user }),
+            'error',
+            error,
             { toast: true }
           );
           return of(UserActions.loadUsersFailure({ error }));
@@ -81,18 +82,18 @@ export class UserEffects {
       .pipe(
         map(() => {
           this.logService.log(
-            'User deleted successfully', 
-            'success', 
-            undefined, 
+            'User deleted successfully',
+            'success',
+            undefined,
             { toast: true }
           );
           return UserActions.loadUsers();
         }),
         catchError(error => {
           this.logService.log(
-            'Failed to delete user', 
-            'error', 
-            error, 
+            this.errorMessageService.getDetailedErrorMessage(`DELETE /users/${id}`, error, { id }),
+            'error',
+            error,
             { toast: true }
           );
           return of(UserActions.loadUsersFailure({ error }));
@@ -103,6 +104,7 @@ export class UserEffects {
   constructor(
     private actions$: Actions,
     private userService: UserService,
-    private logService: LogService
+    private logService: LogService,
+    private errorMessageService: ErrorMessageService
   ) {}
 }

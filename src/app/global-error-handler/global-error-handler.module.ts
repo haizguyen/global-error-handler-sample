@@ -1,27 +1,34 @@
-
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+
+import { ApiLoggingInterceptor } from './interceptors/api-logging.interceptor';
+import { LogService } from './services/log.service';
+import { NotificationService } from './services/notification.service';
+import { ErrorMessageService } from './services/error-message.service';
 import { logReducer } from './store/log.reducer';
 import { LogEffects } from './store/log.effects';
-import { ApiLoggingInterceptor } from './interceptors/api-logging.interceptor';
 
 @NgModule({
+  declarations: [],
   imports: [
+    CommonModule,
     StoreModule.forFeature('log', logReducer),
     EffectsModule.forFeature([LogEffects]),
-    MatSnackBarModule,
-    SweetAlert2Module.forRoot(),
+    SweetAlert2Module.forRoot()
   ],
   providers: [
+    LogService,
+    NotificationService,
+    ErrorMessageService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiLoggingInterceptor,
-      multi: true,
-    },
-  ],
+      multi: true
+    }
+  ]
 })
-export class GlobalErrorHandlerModule {}
+export class GlobalErrorHandlerModule { }
