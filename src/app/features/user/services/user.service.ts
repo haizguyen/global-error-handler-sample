@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { User } from '../models/user.model';
 
@@ -12,27 +12,31 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   getUsers(): Observable<User[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
+    const headers = new HttpHeaders().set('X-Error-Handled', 'true');
+    return this.http.get<any[]>(this.apiUrl, { headers }).pipe(
       map(users => users.map(user => ({
         id: user.id,
         name: user.name,
         email: user.email,
-        role: 'User', // Default role since API doesn't provide this
-        active: true, // Default status since API doesn't provide this
-        createdAt: new Date() // Using current date since API doesn't provide this
+        role: 'User',
+        active: true,
+        createdAt: new Date()
       })))
     );
   }
 
   addUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user);
+    const headers = new HttpHeaders().set('X-Error-Handled', 'true');
+    return this.http.post<User>(this.apiUrl, user, { headers });
   }
 
   updateUser(user: User): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${user.id}`, user);
+    const headers = new HttpHeaders().set('X-Error-Handled', 'true');
+    return this.http.put<User>(`${this.apiUrl}/${user.id}`, user, { headers });
   }
 
   deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    const headers = new HttpHeaders().set('X-Error-Handled', 'true');
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
   }
 }

@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
@@ -10,24 +9,32 @@ export class ApiLoggingInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const started = Date.now();
+    const isErrorHandled = req.headers.has('X-Error-Handled');
 
     return next.handle(req).pipe(
       tap({
         next: (event) => {
           if (event instanceof HttpResponse) {
             const elapsed = Date.now() - started;
-            this.logService.log(`[API SUCCESS] ${req.method} ${req.url} (${elapsed} ms)`, 'success', undefined, { onlyLog: true });
+            this.logService.log(
+              `[API SUCCESS] ${req.method} ${req.url} (${elapsed} ms)`, 
+              'success', 
+              undefined, 
+              { onlyLog: true }
+            );
           }
         },
         error: (error: HttpErrorResponse) => {
-          const elapsed = Date.now() - started;
-          debugger
-          this.logService.log(
-            `[API ERROR] ${req.method} ${req.url} (${elapsed} ms) - Status: ${error.status} - ${error.message}`,
-            'error',
-            (error as any).stack,
-            { onlyLog: true }
-          );
+          // Skip logging if error is handled by effects
+          if (!isErrorHandled) {
+            const elapsed = Date.now() - started;
+            this.logService.log(
+              `[API ERROR] ${req.method} ${req.url} (${elapsed} ms) - Status: ${error.status} - ${error.message}`,
+              'error',
+              (error as any).stack,
+              { onlyLog: true }
+            );
+          }
         },
       })
     );
