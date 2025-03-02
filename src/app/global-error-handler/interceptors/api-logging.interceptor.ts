@@ -21,6 +21,7 @@ export class ApiLoggingInterceptor implements HttpInterceptor {
         },
         error: (error: HttpErrorResponse) => {
           const elapsed = Date.now() - started;
+          debugger
           this.logService.log(
             `[API ERROR] ${req.method} ${req.url} (${elapsed} ms) - Status: ${error.status} - ${error.message}`,
             'error',

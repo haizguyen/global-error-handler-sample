@@ -1,6 +1,27 @@
+<div style="display: flex; flex-direction: column; gap: 20px; padding: 20px;">
+  <div class="demo-section">
+    <h2>Error Logging Demo</h2>
+    <div class="button-group" style="display: flex; gap: 10px;">
+      <button mat-raised-button color="primary" (click)="logSuccess()">Log Success (Toast)</button>
+      <button mat-raised-button color="warn" (click)="logError()">Log Error (Popup)</button>
+      <button mat-raised-button color="accent" (click)="throwError()">Throw Error</button>
+    </div>
+  </div>
 
-<div style="display: flex; flex-direction: column; gap: 10px; padding: 20px;">
-  <button mat-raised-button color="primary" (click)="logSuccess()">Log Success (Toast)</button>
-  <button mat-raised-button color="warn" (click)="logError()">Log Error (Popup)</button>
-  <button mat-raised-button color="accent" (click)="throwError()">Throw Error</button>
+  <div class="demo-section">
+    <h2>HTTP Error Demo</h2>
+    <div class="button-group" style="display: flex; gap: 10px;">
+      <button mat-raised-button color="warn" (click)="triggerHttpError()">
+        Trigger HTTP Error
+      </button>
+      <button mat-raised-button color="warn" (click)="triggerDirectError()">
+        Trigger Direct Error
+      </button>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>User Management Demo</h2>
+    <app-user-list></app-user-list>
+  </div>
 </div>

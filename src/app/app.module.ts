@@ -10,6 +10,7 @@ import { GlobalErrorHandlerModule } from './global-error-handler/global-error-ha
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { UserModule } from './features/user/user.module';
 
 @NgModule({
   declarations: [AppComponent, DemoComponent],
@@ -22,6 +23,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     GlobalErrorHandlerModule,
     StoreDevtoolsModule.instrument({ maxAge: 25 }),
     MatButtonModule,
+    UserModule,
   ],
   bootstrap: [AppComponent],
 })

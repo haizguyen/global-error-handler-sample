@@ -1,0 +1,44 @@
+.user-list-container {
+  padding: 20px;
+  position: relative;
+}
+
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+table {
+  width: 100%;
+}
+
+.mat-column-actions {
+  width: 120px;
+  text-align: center;
+}
+
+.mat-column-id {
+  width: 80px;
+}
+
+.active {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.inactive {
+  color: #f44336;
+  font-weight: 500;
+}
+
+td.mat-cell {
+  padding: 8px;
+}
+
+th.mat-header-cell {
+  padding: 8px;
+  font-weight: bold;
+}
