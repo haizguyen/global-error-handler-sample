@@ -1,7 +1,7 @@
 <div style="display: flex; flex-direction: column; gap: 20px; padding: 20px;">
   <div class="demo-section">
-    <h2>Error Logging Demo</h2>
-    <div class="button-group" style="display: flex; gap: 10px;">
+    <h2>Basic Error Logging</h2>
+    <div class="button-group">
       <button mat-raised-button color="primary" (click)="logSuccess()">Log Success (Toast)</button>
       <button mat-raised-button color="warn" (click)="logError()">Log Error (Popup)</button>
       <button mat-raised-button color="accent" (click)="throwError()">Throw Error</button>
@@ -9,19 +9,46 @@
   </div>
 
   <div class="demo-section">
-    <h2>HTTP Error Demo</h2>
-    <div class="button-group" style="display: flex; gap: 10px;">
-      <button mat-raised-button color="warn" (click)="triggerHttpError()">
-        Trigger HTTP Error
-      </button>
-      <button mat-raised-button color="warn" (click)="triggerDirectError()">
-        Trigger Direct Error
-      </button>
-    </div>
+    <h2>HTTP Error Scenarios</h2>
+    <app-error-boundary fallback="Failed to load error demos">
+      <div class="button-group">
+        <button mat-raised-button color="warn" (click)="triggerHttpError()">
+          Timeout Error
+        </button>
+        <button mat-raised-button color="warn" (click)="triggerNetworkError()">
+          Network Error
+        </button>
+        <button mat-raised-button color="warn" (click)="triggerAuthError()">
+          Auth Error (401)
+        </button>
+        <button mat-raised-button color="warn" (click)="triggerServerError()">
+          Server Error (500)
+        </button>
+      </div>
+    </app-error-boundary>
+  </div>
+
+  <div class="demo-section">
+    <h2>Advanced Error Scenarios</h2>
+    <app-error-boundary fallback="Failed to load advanced error demos">
+      <div class="button-group">
+        <button mat-raised-button color="warn" (click)="triggerValidationError()">
+          Validation Error
+        </button>
+        <button mat-raised-button color="warn" (click)="triggerRateLimit()">
+          Rate Limit Error
+        </button>
+        <button mat-raised-button color="primary" (click)="testErrorRecovery()">
+          Test Error Recovery
+        </button>
+      </div>
+    </app-error-boundary>
   </div>
 
   <div class="demo-section">
     <h2>User Management Demo</h2>
-    <app-user-list></app-user-list>
+    <app-error-boundary fallback="Failed to load user management">
+      <app-user-list></app-user-list>
+    </app-error-boundary>
   </div>
 </div>
