@@ -1,6 +1,10 @@
 {
   "name": "global-error-handler-sample",
   "version": "1.0.0",
+  "volta": {
+    "node": "20.11.1",
+    "npm": "10.2.4"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
