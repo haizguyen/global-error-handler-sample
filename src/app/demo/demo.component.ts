@@ -1,21 +1,29 @@
 import { Component } from '@angular/core';
 import { LogService } from '../global-error-handler/services/log.service';
 import { ErrorDemoService } from './services/error-demo.service';
-import { ErrorMessageService } from '../global-error-handler/services/error-message.service';
-import { ErrorHandlerService } from '../global-error-handler/services/error-handler.service';
 import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { ErrorBoundaryComponent } from '../global-error-handler/error-boundary/error-boundary.component';
+import { UserListComponent } from '../features/user/components/user-list/user-list.component';
 
 @Component({
   selector: 'app-demo',
   templateUrl: './demo.component.html',
-  styleUrls: ['./demo.component.css']
+  styleUrls: ['./demo.component.css'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    ErrorBoundaryComponent,
+    UserListComponent
+  ]
 })
 export class DemoComponent {
   constructor(
     private logService: LogService,
-    private errorDemoService: ErrorDemoService,
-    private errorHandler: ErrorHandlerService
+    private errorDemoService: ErrorDemoService
   ) {}
 
   logSuccess() {
@@ -30,23 +38,60 @@ export class DemoComponent {
     throw new Error('This is a simulated error!');
   }
 
-  triggerHttpError() {
+  // Test various error scenarios
+  triggerHttpError(): void {
     this.errorDemoService.simulateHttpError()
-      .pipe(
-        catchError(error => {
-          return of(null); // Prevent the error from propagating after handling
-        })
-      )
+      .pipe(catchError(error => of(null)))
       .subscribe();
   }
 
-  triggerDirectError() {
-    this.errorDemoService.simulateDirectError()
-      .pipe(
-        catchError(error => {
-          return of(null); // Prevent the error from propagating after handling
-        })
-      )
+  triggerNetworkError(): void {
+    this.errorDemoService.simulateNetworkError()
+      .pipe(catchError(error => of(null)))
       .subscribe();
+  }
+
+  triggerAuthError(): void {
+    this.errorDemoService.simulateAuthError()
+      .pipe(catchError(error => of(null)))
+      .subscribe();
+  }
+
+  triggerServerError(): void {
+    this.errorDemoService.simulateServerError()
+      .pipe(catchError(error => of(null)))
+      .subscribe();
+  }
+
+  triggerValidationError(): void {
+    this.errorDemoService.simulateValidationError()
+      .pipe(catchError(error => of(null)))
+      .subscribe();
+  }
+
+  triggerRateLimit(): void {
+    const subscription: Subscription = this.errorDemoService.simulateRateLimit()
+      .pipe(catchError(error => of(null)))
+      .subscribe({
+        error: () => subscription.unsubscribe(),
+        complete: () => subscription.unsubscribe()
+      });
+  }
+
+  testErrorRecovery(): void {
+    this.errorDemoService.simulateRecovery()
+      .pipe(catchError(error => of(null)))
+      .subscribe({
+        next: (result) => {
+          if (result) {
+            this.logService.log(
+              'Successfully recovered from error!',
+              'success',
+              undefined,
+              { toast: true }
+            );
+          }
+        }
+      });
   }
 }
