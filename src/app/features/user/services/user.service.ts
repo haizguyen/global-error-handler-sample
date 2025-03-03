@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { User } from '../models/user.model';
 import { BaseApiService } from '../../../global-error-handler/services/base-api.service';
 import { LogService } from '../../../global-error-handler/services/log.service';
+import { ErrorHandlerService } from '../../../global-error-handler/services/error-handler.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,10 @@ export class UserService extends BaseApiService {
 
   constructor(
     http: HttpClient,
-    logService: LogService
+    logService: LogService,
+    errorHandler: ErrorHandlerService
   ) {
-    super(http, logService);
+    super(http, logService, errorHandler);
   }
 
   getUsers(): Observable<User[]> {
