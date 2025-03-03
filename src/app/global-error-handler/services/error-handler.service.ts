@@ -13,7 +13,9 @@ export class ErrorHandlerService implements ErrorHandler {
     private zone: NgZone
   ) {}
 
-  // Implementation of Angular's ErrorHandler interface
+  /**
+   * Implementation of Angular's ErrorHandler interface
+   */
   handleError(error: any): void {
     // Run inside Angular's zone to ensure UI updates
     this.zone.run(() => {
@@ -45,7 +47,7 @@ export class ErrorHandlerService implements ErrorHandler {
         const errorResponse = this.createErrorResponse(
           'An unexpected error occurred.',
           ErrorCode.UNKNOWN_ERROR,
-          this.formatTechnicalDetails('RuntimeError', error)
+          this.formatTechnicalDetails('RuntimeError', error instanceof Error ? error : new Error(String(error)))
         );
         this.logService.log(
           errorResponse.friendlyMessage,
@@ -61,9 +63,21 @@ export class ErrorHandlerService implements ErrorHandler {
    * Handle HTTP errors with detailed information and return an Observable
    */
   handleHttpError(operation: string, error: HttpErrorResponse, additionalInfo?: any): Observable<never> {
-    const errorCode = mapHttpStatusToErrorCode(error.status);
-    const friendlyMessage = ErrorMessages[errorCode];
+    let errorCode = mapHttpStatusToErrorCode(error.status);
     
+    // Handle offline state
+    if (!navigator.onLine) {
+      errorCode = ErrorCode.OFFLINE;
+    }
+
+    // Handle validation errors
+    if (error.status === 400 && error.error?.errors) {
+      const validationErrors = Object.values(error.error.errors);
+      if (validationErrors.length > 0) {
+        additionalInfo = { ...additionalInfo, validationErrors };
+      }
+    }
+
     const errorResponse: ErrorResponse = {
       error: {
         code: errorCode,
@@ -71,13 +85,13 @@ export class ErrorHandlerService implements ErrorHandler {
         details: error.error,
         timestamp: new Date().toISOString()
       },
-      friendlyMessage,
+      friendlyMessage: error.error?.message || ErrorMessages[errorCode],
       technicalDetails: this.formatTechnicalDetails(operation, error, additionalInfo)
     };
 
     // Log the error with technical details
     this.logService.log(
-      friendlyMessage,
+      errorResponse.friendlyMessage,
       'error',
       errorResponse.technicalDetails,
       { toast: true }
@@ -128,7 +142,7 @@ export class ErrorHandlerService implements ErrorHandler {
     if (additionalInfo) {
       details.push(
         '=== Additional Info ===',
-        JSON.stringify(additionalInfo, null, 2)
+        typeof additionalInfo === 'string' ? additionalInfo : JSON.stringify(additionalInfo, null, 2)
       );
     }
 
