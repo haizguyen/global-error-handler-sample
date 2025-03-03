@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { ErrorHandlerService } from '../services/error-handler.service';
 
 export function HandleError(operation: string) {
@@ -22,16 +22,18 @@ export function HandleError(operation: string) {
         if (result && result instanceof Observable) {
           return result.pipe(
             catchError((error: HttpErrorResponse) => {
-              return errorHandler.handleError(operation, error, { args });
+              errorHandler.handleHttpError(operation, error, { args }).subscribe();
+              return of(null); // Return empty observable after handling error
             })
           );
         }
         return result;
       } catch (error) {
         if (error instanceof HttpErrorResponse) {
-          return errorHandler.handleError(operation, error, { args });
+          errorHandler.handleHttpError(operation, error, { args }).subscribe();
+          return of(null); // Return empty observable for synchronous errors
         }
-        throw error;
+        throw error; // Re-throw non-HTTP errors
       }
     };
 
