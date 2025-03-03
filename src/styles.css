@@ -1,6 +1,34 @@
-
 /* Global styles */
 body {
   margin: 0;
   font-family: Roboto, Arial, sans-serif;
+}
+
+/* Snackbar status styles */
+.success-snackbar {
+  background-color: #4caf50 !important;
+  color: #fff;
+}
+
+.error-snackbar {
+  background-color: #f44336 !important;
+  color: #fff;
+}
+
+.warning-snackbar {
+  background-color: #ff9800 !important;
+  color: #fff;
+}
+
+.info-snackbar {
+  background-color: #2196f3 !important;
+  color: #fff;
+}
+
+/* Add close button color */
+.success-snackbar .mat-simple-snackbar-action,
+.error-snackbar .mat-simple-snackbar-action,
+.warning-snackbar .mat-simple-snackbar-action,
+.info-snackbar .mat-simple-snackbar-action {
+  color: #fff;
 }
