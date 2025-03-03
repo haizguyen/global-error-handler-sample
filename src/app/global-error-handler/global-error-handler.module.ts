@@ -5,10 +5,10 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 import { apiLoggingInterceptor } from './interceptors/api-logging.interceptor';
 import { LogService } from './services/log.service';
-import { NotificationService } from './services/notification.service';
 import { ErrorHandlerService } from './services/error-handler.service';
 import { logReducer } from './store/log.reducer';
 import { LogEffects } from './store/log.effects';
+import { DefaultNotificationService, NOTIFICATION_SERVICE } from './services/notification.interface';
 
 @NgModule({
   declarations: [],
@@ -18,7 +18,10 @@ import { LogEffects } from './store/log.effects';
   ],
   providers: [
     LogService,
-    NotificationService,
+    {
+      provide: NOTIFICATION_SERVICE,
+      useClass: DefaultNotificationService
+    },
     ErrorHandlerService,
     {
       provide: HTTP_INTERCEPTORS,

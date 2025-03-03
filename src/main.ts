@@ -13,24 +13,42 @@ import { GlobalErrorHandlerModule } from './app/global-error-handler/global-erro
 import { DemoErrorHandler } from './app/demo/services/demo-error-handler';
 import { logReducer } from './app/global-error-handler/store/log.reducer';
 import { LogEffects } from './app/global-error-handler/store/log.effects';
+import { MaterialNotificationService } from './app/global-error-handler/services/material-notification.service';
+import { NOTIFICATION_SERVICE } from './app/global-error-handler/services/notification.interface';
 
 bootstrapApplication(AppComponent, {
   providers: [
+    // First include GlobalErrorHandlerModule for base functionality
     importProvidersFrom(GlobalErrorHandlerModule),
+    
+    // Override notifications with Material implementation
+    // {
+    //   provide: NOTIFICATION_SERVICE,
+    //   useClass: MaterialNotificationService
+    // },
+    
+    // Then override with DemoErrorHandler
     {
       provide: ErrorHandler,
       useClass: DemoErrorHandler
     },
+
+    // Core providers
     provideAnimations(),
     provideHttpClient(),
+
+    // Store configuration
     provideStore({
       user: userReducer,
       log: logReducer
     }),
+    
+    // Effects configuration
     provideEffects([
       UserEffects,
       LogEffects
     ]),
+    
     provideStoreDevtools({
       maxAge: 25,
       connectInZone: true

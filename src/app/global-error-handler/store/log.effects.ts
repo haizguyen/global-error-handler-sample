@@ -1,12 +1,16 @@
-
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { writeLog } from './log.actions';
 import { tap } from 'rxjs/operators';
-import { NotificationService } from '../services/notification.service';
+import { INotificationService, NOTIFICATION_SERVICE } from '../services/notification.interface';
 
 @Injectable()
 export class LogEffects {
+  constructor(
+    private actions$: Actions,
+    @Inject(NOTIFICATION_SERVICE) private notificationService: INotificationService
+  ) {}
+
   writeLog$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -18,6 +22,4 @@ export class LogEffects {
       ),
     { dispatch: false }
   );
-
-  constructor(private actions$: Actions, private notificationService: NotificationService) {}
 }
