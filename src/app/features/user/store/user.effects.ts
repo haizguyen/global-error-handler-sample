@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { map, mergeMap, catchError } from 'rxjs/operators';
 import { UserService } from '../services/user.service';
 import { LogService } from '../../../global-error-handler/services/log.service';
-import { ErrorMessageService } from '../../../global-error-handler/services/error-message.service';
+import { ErrorHandlerService } from '../../../global-error-handler/services/error-handler.service';
 import * as UserActions from './user.actions';
 
 @Injectable()
@@ -15,12 +15,7 @@ export class UserEffects {
       .pipe(
         map(users => UserActions.loadUsersSuccess({ users })),
         catchError(error => {
-          this.logService.log(
-            this.errorMessageService.getDetailedErrorMessage('GET /users', error),
-            'error',
-            error,
-            { popup: true }
-          );
+          this.errorHandler.handleError('GET /users', error);
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))
@@ -40,12 +35,7 @@ export class UserEffects {
           return UserActions.loadUsers();
         }),
         catchError(error => {
-          this.logService.log(
-            this.errorMessageService.getDetailedErrorMessage('POST /users', error, { user }),
-            'error',
-            error,
-            { toast: true }
-          );
+          this.errorHandler.handleError('POST /users', error, { user });
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))
@@ -65,12 +55,7 @@ export class UserEffects {
           return UserActions.loadUsers();
         }),
         catchError(error => {
-          this.logService.log(
-            this.errorMessageService.getDetailedErrorMessage(`PUT /users/${user.id}`, error, { user }),
-            'error',
-            error,
-            { toast: true }
-          );
+          this.errorHandler.handleError(`PUT /users/${user.id}`, error, { user });
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))
@@ -90,12 +75,7 @@ export class UserEffects {
           return UserActions.loadUsers();
         }),
         catchError(error => {
-          this.logService.log(
-            this.errorMessageService.getDetailedErrorMessage(`DELETE /users/${id}`, error, { id }),
-            'error',
-            error,
-            { toast: true }
-          );
+          this.errorHandler.handleError(`DELETE /users/${id}`, error, { id });
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))
@@ -105,6 +85,6 @@ export class UserEffects {
     private actions$: Actions,
     private userService: UserService,
     private logService: LogService,
-    private errorMessageService: ErrorMessageService
+    private errorHandler: ErrorHandlerService
   ) {}
 }
