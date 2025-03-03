@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
-import { ErrorCode, ErrorResponse, mapHttpStatusToErrorCode } from '../models/error.model';
+import { ErrorCode, ErrorMessages, ErrorResponse, mapHttpStatusToErrorCode } from '../models/error.model';
 import { LogService } from './log.service';
 
 @Injectable()
@@ -89,29 +89,18 @@ export abstract class BaseApiService {
 
   private getFriendlyMessage(error: HttpErrorResponse): string {
     if (!navigator.onLine) {
-      return 'Please check your internet connection and try again.';
+      return ErrorMessages[ErrorCode.OFFLINE];
     }
 
-    switch (error.status) {
-      case 0:
-        return 'Unable to connect to the server. Please try again later.';
-      case 400:
-        return this.getBadRequestMessage(error);
-      case 401:
-        return 'Your session has expired. Please log in again.';
-      case 403:
-        return 'You do not have permission to perform this action.';
-      case 404:
-        return 'The requested resource was not found.';
-      case 408:
-        return 'The request timed out. Please try again.';
-      case 429:
-        return 'Too many requests. Please wait a moment and try again.';
-      case 500:
-        return 'An internal server error occurred. Please try again later.';
-      default:
-        return error.error?.message || 'An unexpected error occurred.';
+    const errorCode = mapHttpStatusToErrorCode(error.status);
+    
+    // Special handling for validation errors
+    if (errorCode === ErrorCode.INVALID_REQUEST) {
+      return this.getBadRequestMessage(error);
     }
+    
+    // Use standard error messages for other cases
+    return error.error?.message || ErrorMessages[errorCode];
   }
 
   private getBadRequestMessage(error: HttpErrorResponse): string {
