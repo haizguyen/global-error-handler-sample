@@ -4,7 +4,7 @@ import { Observable, timer } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { BaseApiService } from '../../global-error-handler/services/base-api.service';
 import { LogService } from '../../global-error-handler/services/log.service';
-import { SimulatedHttpError } from '../../global-error-handler/models/http-error.model';
+import { ErrorHandlerService } from '../../global-error-handler/services/error-handler.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +12,10 @@ import { SimulatedHttpError } from '../../global-error-handler/models/http-error
 export class ErrorDemoService extends BaseApiService {
   constructor(
     http: HttpClient,
-    logService: LogService
+    logService: LogService,
+    errorHandler: ErrorHandlerService
   ) {
-    super(http, logService);
+    super(http, logService, errorHandler);
   }
 
   // Test various error scenarios

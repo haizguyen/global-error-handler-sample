@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ErrorHandler } from '@angular/core';
 import { LogService } from '../global-error-handler/services/log.service';
 import { ErrorDemoService } from './services/error-demo.service';
 import { catchError } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { ErrorBoundaryComponent } from '../global-error-handler/error-boundary/error-boundary.component';
 import { UserListComponent } from '../features/user/components/user-list/user-list.component';
+import { DemoErrorHandler } from './services/demo-error-handler';
 
 @Component({
   selector: 'app-demo',
@@ -18,6 +19,9 @@ import { UserListComponent } from '../features/user/components/user-list/user-li
     MatButtonModule,
     ErrorBoundaryComponent,
     UserListComponent
+  ],
+  providers: [
+    { provide: ErrorHandler, useClass: DemoErrorHandler }
   ]
 })
 export class DemoComponent {

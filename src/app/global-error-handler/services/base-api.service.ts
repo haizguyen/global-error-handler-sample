@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
-import { ErrorCode, ErrorMessages, ErrorResponse, mapHttpStatusToErrorCode } from '../models/error.model';
+import { ErrorHandlerService } from './error-handler.service';
 import { LogService } from './log.service';
 
 @Injectable()
 export abstract class BaseApiService {
   protected constructor(
     protected http: HttpClient,
-    protected logService: LogService
+    protected logService: LogService,
+    protected errorHandler: ErrorHandlerService
   ) {}
 
   protected createRequest<T>(
@@ -42,7 +43,7 @@ export abstract class BaseApiService {
     }).pipe(
       timeout(timeoutMs),
       retry({ count: retries, delay: 1000 }), // Retry with 1 second delay
-      catchError((error: HttpErrorResponse) => this.handleError(error, suppressError))
+      catchError((error: HttpErrorResponse) => this.handleRequestError(method, url, error, suppressError))
     );
   }
 
@@ -62,73 +63,27 @@ export abstract class BaseApiService {
     return this.createRequest<T>('DELETE', url, options);
   }
 
-  private handleError(error: HttpErrorResponse, suppressError: boolean): Observable<never> {
-    const errorCode = mapHttpStatusToErrorCode(error.status);
-    const errorResponse: ErrorResponse = {
-      error: {
-        code: errorCode,
-        message: error.message,
-        details: error.error,
-        timestamp: new Date().toISOString()
-      },
-      friendlyMessage: this.getFriendlyMessage(error),
-      technicalDetails: this.getTechnicalDetails(error)
-    };
-
+  private handleRequestError(method: string, url: string, error: HttpErrorResponse, suppressError: boolean): Observable<never> {
+    const operation = `${method} ${url}`;
+    
     if (!suppressError) {
-      this.logService.log(
-        errorResponse.friendlyMessage,
-        'error',
-        errorResponse.technicalDetails,
-        { toast: true }
-      );
-    }
-
-    return throwError(() => errorResponse);
-  }
-
-  private getFriendlyMessage(error: HttpErrorResponse): string {
-    if (!navigator.onLine) {
-      return ErrorMessages[ErrorCode.OFFLINE];
-    }
-
-    const errorCode = mapHttpStatusToErrorCode(error.status);
-    
-    // Special handling for validation errors
-    if (errorCode === ErrorCode.INVALID_REQUEST) {
-      return this.getBadRequestMessage(error);
-    }
-    
-    // Use standard error messages for other cases
-    return error.error?.message || ErrorMessages[errorCode];
-  }
-
-  private getBadRequestMessage(error: HttpErrorResponse): string {
-    if (error.error?.errors) {
-      // Handle validation errors
-      const validationErrors = Object.values(error.error.errors);
-      if (validationErrors.length > 0) {
-        return validationErrors.join('. ');
+      if (!navigator.onLine) {
+        return this.errorHandler.handleHttpError(operation, error, { isOffline: true });
       }
-    }
-    return 'Invalid request. Please check your input and try again.';
-  }
 
-  private getTechnicalDetails(error: HttpErrorResponse): string {
-    const details = [
-      `URL: ${error.url}`,
-      `Status: ${error.status} ${error.statusText}`,
-      `Time: ${new Date().toISOString()}`
-    ];
+      // Special handling for validation errors
+      if (error.status === 400 && error.error?.errors) {
+        const validationErrors = Object.values(error.error.errors);
+        if (validationErrors.length > 0) {
+          const message = validationErrors.join('. ');
+          return this.errorHandler.handleHttpError(operation, error, { validationErrors: message });
+        }
+      }
 
-    if (error.error?.message) {
-      details.push(`Server Message: ${error.error.message}`);
+      return this.errorHandler.handleHttpError(operation, error);
     }
 
-    if (error.error?.stack) {
-      details.push(`Stack Trace: ${error.error.stack}`);
-    }
-
-    return details.join('\n');
+    // If error is suppressed, just return an error observable without logging
+    return throwError(() => error);
   }
 }

@@ -1,43 +1,41 @@
 import { ErrorHandler, Injectable, NgZone } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { LogService } from './log.service';
-import { ErrorResponse } from '../models/error.model';
+import { LogService } from '../../global-error-handler/services/log.service';
+import { ErrorResponse } from '../../global-error-handler/models/error.model';
 
 @Injectable()
-export class CustomErrorHandler implements ErrorHandler {
+export class DemoErrorHandler implements ErrorHandler {
   constructor(
     private logService: LogService,
     private zone: NgZone
   ) {}
 
   handleError(error: Error | HttpErrorResponse | ErrorResponse): void {
-    // Run inside Angular's zone to ensure UI updates
     this.zone.run(() => {
       if (this.isErrorResponse(error)) {
-        // Handle our custom ErrorResponse
+        // For demo errors, we'll show them as popups instead of toasts
         this.logService.log(
-          error.friendlyMessage,
+          `Demo Error: ${error.friendlyMessage}`,
           'error',
           error.technicalDetails,
-          { toast: true }
+          { popup: true }
         );
       } else if (error instanceof HttpErrorResponse) {
-        // Only handle if not already handled by services
         if (!error.headers?.get('X-Error-Handled')) {
           this.logService.log(
-            'An unexpected HTTP error occurred.',
+            'Demo encountered an HTTP error.',
             'error',
             this.getErrorDetails(error),
-            { toast: true }
+            { popup: true }
           );
         }
       } else {
-        // Handle other errors (runtime errors, etc.)
+        // For runtime errors in demo, show more details to the user
         this.logService.log(
-          'An unexpected error occurred.',
+          `Demo Runtime Error: ${error.message}`,
           'error',
           this.getErrorDetails(error),
-          { toast: true }
+          { popup: true }
         );
       }
     });
@@ -49,19 +47,24 @@ export class CustomErrorHandler implements ErrorHandler {
 
   private getErrorDetails(error: Error | HttpErrorResponse): string {
     const details: string[] = [
+      '=== Demo Error Details ===',
       `Type: ${error.constructor.name}`,
       `Message: ${error.message}`
     ];
 
     if (error instanceof HttpErrorResponse) {
       details.push(
+        '=== HTTP Details ===',
         `Status: ${error.status} ${error.statusText}`,
-        `URL: ${error.url}`
+        `URL: ${error.url}`,
+        '=== Request Details ===',
+        `Method: ${error.error?.method || 'N/A'}`,
+        `Headers: ${JSON.stringify(error.headers, null, 2)}`
       );
     }
 
     if ('stack' in error && error.stack) {
-      details.push(`Stack: ${error.stack}`);
+      details.push('=== Stack Trace ===', error.stack);
     }
 
     return details.join('\n');

@@ -15,7 +15,7 @@ export class UserEffects {
       .pipe(
         map(users => UserActions.loadUsersSuccess({ users })),
         catchError(error => {
-          this.errorHandler.handleError('GET /users', error);
+          this.errorHandler.handleHttpError('GET /users', error).subscribe();
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))
@@ -35,7 +35,7 @@ export class UserEffects {
           return UserActions.loadUsers();
         }),
         catchError(error => {
-          this.errorHandler.handleError('POST /users', error, { user });
+          this.errorHandler.handleHttpError('POST /users', error, { user }).subscribe();
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))
@@ -55,7 +55,7 @@ export class UserEffects {
           return UserActions.loadUsers();
         }),
         catchError(error => {
-          this.errorHandler.handleError(`PUT /users/${user.id}`, error, { user });
+          this.errorHandler.handleHttpError(`PUT /users/${user.id}`, error, { user }).subscribe();
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))
@@ -75,7 +75,7 @@ export class UserEffects {
           return UserActions.loadUsers();
         }),
         catchError(error => {
-          this.errorHandler.handleError(`DELETE /users/${id}`, error, { id });
+          this.errorHandler.handleHttpError(`DELETE /users/${id}`, error, { id }).subscribe();
           return of(UserActions.loadUsersFailure({ error }));
         })
       ))

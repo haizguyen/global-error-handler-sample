@@ -4,7 +4,6 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { ErrorHandler } from '@angular/core';
 
 import { AppComponent } from './app/app.component';
 import { userReducer } from './app/features/user/store/user.reducer';
@@ -13,7 +12,6 @@ import { ErrorHandlerProviders } from './app/global-error-handler/config/error-h
 import { logReducer } from './app/global-error-handler/store/log.reducer';
 import { LogEffects } from './app/global-error-handler/store/log.effects';
 import { apiLoggingInterceptor } from './app/global-error-handler/interceptors/api-logging.interceptor';
-import { CustomErrorHandler } from './app/global-error-handler/services/custom-error-handler';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -33,7 +31,6 @@ bootstrapApplication(AppComponent, {
       maxAge: 25,
       connectInZone: true
     }),
-    { provide: ErrorHandler, useClass: CustomErrorHandler },
     ...ErrorHandlerProviders
   ]
 }).catch(err => console.error(err));
