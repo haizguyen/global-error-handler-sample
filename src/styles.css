@@ -4,43 +4,39 @@ body {
   font-family: Roboto, Arial, sans-serif;
 }
 
-/* Snackbar base styles */
-.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+/* Base snackbar styles */
+.mdc-snackbar__surface {
   background-color: #323232;
 }
 
-/* Success snackbar */
-.mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
+/* Success variant */
+.success-snackbar .mdc-snackbar__surface {
   background-color: #4caf50 !important;
 }
 
-/* Error snackbar */
-.mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__surface {
+/* Error variant */
+.error-snackbar .mdc-snackbar__surface {
   background-color: #f44336 !important;
 }
 
-/* Warning snackbar */
-.mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__surface {
+/* Warning variant */
+.warning-snackbar .mdc-snackbar__surface {
   background-color: #ff9800 !important;
 }
 
-/* Info snackbar */
-.mat-mdc-snack-bar-container.info-snackbar .mdc-snackbar__surface {
+/* Info variant */
+.info-snackbar .mdc-snackbar__surface {
   background-color: #2196f3 !important;
 }
 
-/* Text color overrides */
-.mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__label,
-.mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__label,
-.mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__label,
-.mat-mdc-snack-bar-container.info-snackbar .mdc-snackbar__label {
-  color: white !important;
-}
-
-/* Button color overrides */
-.mat-mdc-snack-bar-container.success-snackbar .mat-mdc-button,
-.mat-mdc-snack-bar-container.error-snackbar .mat-mdc-button,
-.mat-mdc-snack-bar-container.warning-snackbar .mat-mdc-button,
-.mat-mdc-snack-bar-container.info-snackbar .mat-mdc-button {
+/* Ensure text and buttons are white for all variants */
+.success-snackbar .mdc-snackbar__label,
+.error-snackbar .mdc-snackbar__label,
+.warning-snackbar .mdc-snackbar__label,
+.info-snackbar .mdc-snackbar__label,
+.success-snackbar .mat-mdc-snack-bar-actions .mdc-button__label,
+.error-snackbar .mat-mdc-snack-bar-actions .mdc-button__label,
+.warning-snackbar .mat-mdc-snack-bar-actions .mdc-button__label,
+.info-snackbar .mat-mdc-snack-bar-actions .mdc-button__label {
   color: white !important;
 }
