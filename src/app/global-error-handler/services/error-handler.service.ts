@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { ErrorHandler, Injectable, NgZone } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { ErrorCode, ErrorMessages, ErrorResponse, mapHttpStatusToErrorCode } from '../models/error.model';
@@ -7,10 +7,60 @@ import { LogService } from './log.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ErrorHandlerService {
-  constructor(private logService: LogService) {}
+export class ErrorHandlerService implements ErrorHandler {
+  constructor(
+    private logService: LogService,
+    private zone: NgZone
+  ) {}
 
-  handleError(operation: string, error: HttpErrorResponse, additionalInfo?: any): Observable<never> {
+  // Implementation of Angular's ErrorHandler interface
+  handleError(error: any): void {
+    // Run inside Angular's zone to ensure UI updates
+    this.zone.run(() => {
+      if (this.isErrorResponse(error)) {
+        // Handle our custom ErrorResponse
+        this.logService.log(
+          error.friendlyMessage,
+          'error',
+          error.technicalDetails,
+          { toast: true }
+        );
+      } else if (error instanceof HttpErrorResponse) {
+        // Only handle if not already handled by services
+        if (!error.headers?.get('X-Error-Handled')) {
+          const errorResponse = this.createErrorResponse(
+            'An unexpected HTTP error occurred.',
+            ErrorCode.UNKNOWN_ERROR,
+            this.formatTechnicalDetails('UnhandledHttpError', error)
+          );
+          this.logService.log(
+            errorResponse.friendlyMessage,
+            'error',
+            errorResponse.technicalDetails,
+            { toast: true }
+          );
+        }
+      } else {
+        // Handle runtime errors
+        const errorResponse = this.createErrorResponse(
+          'An unexpected error occurred.',
+          ErrorCode.UNKNOWN_ERROR,
+          this.formatTechnicalDetails('RuntimeError', error)
+        );
+        this.logService.log(
+          errorResponse.friendlyMessage,
+          'error',
+          errorResponse.technicalDetails,
+          { toast: true }
+        );
+      }
+    });
+  }
+
+  /**
+   * Handle HTTP errors with detailed information and return an Observable
+   */
+  handleHttpError(operation: string, error: HttpErrorResponse, additionalInfo?: any): Observable<never> {
     const errorCode = mapHttpStatusToErrorCode(error.status);
     const friendlyMessage = ErrorMessages[errorCode];
     
@@ -36,28 +86,9 @@ export class ErrorHandlerService {
     return throwError(() => errorResponse);
   }
 
-  private formatTechnicalDetails(operation: string, error: HttpErrorResponse, additionalInfo?: any): string {
-    let details = `Operation: ${operation}\n`;
-    details += `Status: ${error.status} ${error.statusText}\n`;
-    details += `URL: ${error.url}\n`;
-    
-    if (error.error?.message) {
-      details += `Server Message: ${error.error.message}\n`;
-    }
-
-    if (additionalInfo) {
-      details += `Additional Info: ${JSON.stringify(additionalInfo, null, 2)}\n`;
-    }
-
-    // Type assertion for stack trace access
-    const errorWithStack = error as unknown as Error;
-    if (errorWithStack.stack) {
-      details += `Stack Trace: ${errorWithStack.stack}`;
-    }
-
-    return details;
-  }
-
+  /**
+   * Create a standardized error response
+   */
   createErrorResponse(message: string, code: ErrorCode = ErrorCode.UNKNOWN_ERROR, details?: any): ErrorResponse {
     return {
       error: {
@@ -68,5 +99,47 @@ export class ErrorHandlerService {
       },
       friendlyMessage: ErrorMessages[code] || message
     };
+  }
+
+  private isErrorResponse(error: any): error is ErrorResponse {
+    return error && 'friendlyMessage' in error && 'error' in error;
+  }
+
+  private formatTechnicalDetails(operation: string, error: Error | HttpErrorResponse, additionalInfo?: any): string {
+    const details: string[] = [
+      `Operation: ${operation}`,
+      `Type: ${error.constructor.name}`,
+      `Message: ${error.message}`,
+      `Time: ${new Date().toISOString()}`
+    ];
+
+    if (error instanceof HttpErrorResponse) {
+      details.push(
+        '=== HTTP Details ===',
+        `Status: ${error.status} ${error.statusText}`,
+        `URL: ${error.url}`
+      );
+
+      if (error.error?.message) {
+        details.push(`Server Message: ${error.error.message}`);
+      }
+    }
+
+    if (additionalInfo) {
+      details.push(
+        '=== Additional Info ===',
+        JSON.stringify(additionalInfo, null, 2)
+      );
+    }
+
+    // Add stack trace if available
+    if ('stack' in error && error.stack) {
+      details.push(
+        '=== Stack Trace ===',
+        error.stack
+      );
+    }
+
+    return details.join('\n');
   }
 }

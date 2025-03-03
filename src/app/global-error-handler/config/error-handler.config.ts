@@ -9,13 +9,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LogService } from '../services/log.service';
 import { NotificationService } from '../services/notification.service';
 import { ErrorHandlerService } from '../services/error-handler.service';
-import { CustomErrorHandler } from '../services/custom-error-handler';
 
 export const ErrorHandlerProviders = [
   LogService,
   NotificationService,
   ErrorHandlerService,
-  { provide: ErrorHandler, useClass: CustomErrorHandler },
+  { provide: ErrorHandler, useClass: ErrorHandlerService }, // Using unified ErrorHandlerService
   importProvidersFrom(
     CommonModule,
     MatButtonModule,
