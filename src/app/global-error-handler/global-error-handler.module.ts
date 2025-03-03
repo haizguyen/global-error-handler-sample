@@ -5,10 +5,10 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
-import { ApiLoggingInterceptor } from './interceptors/api-logging.interceptor';
+import { apiLoggingInterceptor } from './interceptors/api-logging.interceptor';
 import { LogService } from './services/log.service';
 import { NotificationService } from './services/notification.service';
-import { ErrorMessageService } from './services/error-message.service';
+import { ErrorHandlerService } from './services/error-handler.service';
 import { logReducer } from './store/log.reducer';
 import { LogEffects } from './store/log.effects';
 
@@ -23,10 +23,10 @@ import { LogEffects } from './store/log.effects';
   providers: [
     LogService,
     NotificationService,
-    ErrorMessageService,
+    ErrorHandlerService,
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: ApiLoggingInterceptor,
+      useValue: apiLoggingInterceptor,
       multi: true
     }
   ]
