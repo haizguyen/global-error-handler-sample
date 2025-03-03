@@ -3,7 +3,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { LogService } from '../../global-error-handler/services/log.service';
 import { ErrorResponse } from '../../global-error-handler/models/error.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DemoErrorHandler implements ErrorHandler {
   constructor(
     private logService: LogService,
