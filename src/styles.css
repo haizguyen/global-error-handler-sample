@@ -4,31 +4,43 @@ body {
   font-family: Roboto, Arial, sans-serif;
 }
 
-/* Snackbar status styles */
-.success-snackbar {
+/* Snackbar base styles */
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #323232;
+}
+
+/* Success snackbar */
+.mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
   background-color: #4caf50 !important;
-  color: #fff;
 }
 
-.error-snackbar {
+/* Error snackbar */
+.mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__surface {
   background-color: #f44336 !important;
-  color: #fff;
 }
 
-.warning-snackbar {
+/* Warning snackbar */
+.mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__surface {
   background-color: #ff9800 !important;
-  color: #fff;
 }
 
-.info-snackbar {
+/* Info snackbar */
+.mat-mdc-snack-bar-container.info-snackbar .mdc-snackbar__surface {
   background-color: #2196f3 !important;
-  color: #fff;
 }
 
-/* Add close button color */
-.success-snackbar .mat-simple-snackbar-action,
-.error-snackbar .mat-simple-snackbar-action,
-.warning-snackbar .mat-simple-snackbar-action,
-.info-snackbar .mat-simple-snackbar-action {
-  color: #fff;
+/* Text color overrides */
+.mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__label,
+.mat-mdc-snack-bar-container.error-snackbar .mdc-snackbar__label,
+.mat-mdc-snack-bar-container.warning-snackbar .mdc-snackbar__label,
+.mat-mdc-snack-bar-container.info-snackbar .mdc-snackbar__label {
+  color: white !important;
+}
+
+/* Button color overrides */
+.mat-mdc-snack-bar-container.success-snackbar .mat-mdc-button,
+.mat-mdc-snack-bar-container.error-snackbar .mat-mdc-button,
+.mat-mdc-snack-bar-container.warning-snackbar .mat-mdc-button,
+.mat-mdc-snack-bar-container.info-snackbar .mat-mdc-button {
+  color: white !important;
 }

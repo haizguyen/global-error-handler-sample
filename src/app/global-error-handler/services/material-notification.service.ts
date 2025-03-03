@@ -11,7 +11,7 @@ export class MaterialNotificationService implements INotificationService {
   showToast(message: string, status: LogStatus) {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
-      panelClass: [`${status}-snackbar`],
+      panelClass: [`${status}-snackbar`, 'custom-snackbar'],
     });
   }
 
